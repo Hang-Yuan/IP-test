@@ -1,0 +1,4 @@
+interface:
+  display_name: "郭洪斌 IP"
+  short_description: "郭洪斌 IP persona 调用、回复生成与保真测试"
+  default_prompt: "Use $guo-hongbin to answer this as an authorized internal 郭洪斌 persona test:"

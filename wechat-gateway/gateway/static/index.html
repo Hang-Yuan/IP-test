@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>阶段一 微信呈现</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      background: #f5f7f8;
+      color: #172027;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 360px 1fr;
+    }
+    aside {
+      padding: 24px;
+      background: #101820;
+      color: #f3f7f9;
+    }
+    main {
+      padding: 24px;
+      display: grid;
+      gap: 16px;
+      align-content: start;
+    }
+    h1 {
+      font-size: 24px;
+      margin: 0 0 8px;
+    }
+    h2 {
+      font-size: 16px;
+      margin: 0 0 10px;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      background: #d9f3e4;
+      color: #0f5a31;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .panel {
+      border: 1px solid #d9e0e4;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 16px;
+    }
+    textarea, input {
+      box-sizing: border-box;
+      width: 100%;
+      border: 1px solid #c9d3d8;
+      border-radius: 6px;
+      padding: 10px;
+      font: inherit;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 10px 14px;
+      background: #146c8f;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    button:disabled {
+      background: #8da5b0;
+      cursor: wait;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+    .messages {
+      display: grid;
+      gap: 10px;
+    }
+    .message {
+      border-left: 4px solid #9aa9b0;
+      padding: 10px 12px;
+      background: #f7fafb;
+      white-space: pre-wrap;
+      line-height: 1.6;
+    }
+    .message.out {
+      border-left-color: #146c8f;
+      background: #eef7fb;
+    }
+    .label {
+      font-size: 12px;
+      color: #5c6b72;
+      margin-bottom: 4px;
+    }
+    @media (max-width: 760px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside>
+    <h1>微信呈现 · 阶段一</h1>
+    <p>先验证文字入口：微信消息进来，本地智能体生成长回复，再返回微信。</p>
+    <div class="status" id="status">检查中</div>
+  </aside>
+  <main>
+    <section class="panel">
+      <h2>模拟一条微信消息</h2>
+      <div class="row">
+        <div>
+          <div class="label">用户标识</div>
+          <input id="fromUser" value="demo-user">
+        </div>
+        <button id="sendBtn">发送</button>
+      </div>
+      <div style="height:10px"></div>
+      <textarea id="messageText">郭老师，我现在想做一个自己的AI分身，第一步到底应该先做什么？</textarea>
+    </section>
+    <section class="panel">
+      <h2>消息记录</h2>
+      <div class="messages" id="messages"></div>
+    </section>
+  </main>
+  <script>
+    const statusEl = document.querySelector("#status");
+    const messagesEl = document.querySelector("#messages");
+    const sendBtn = document.querySelector("#sendBtn");
+
+    async function checkHealth() {
+      const res = await fetch("/health");
+      const data = await res.json();
+      statusEl.textContent = `${data.status} · ${data.agent_mode}`;
+    }
+
+    function renderMessage(record) {
+      const div = document.createElement("div");
+      div.className = `message ${record.direction === "out" ? "out" : "in"}`;
+      div.textContent = `[${record.direction}] ${record.user_id}\n${record.text}`;
+      messagesEl.prepend(div);
+    }
+
+    async function loadMessages() {
+      const res = await fetch("/admin/messages?limit=20");
+      const data = await res.json();
+      messagesEl.innerHTML = "";
+      data.messages.reverse().forEach(renderMessage);
+    }
+
+    async function sendMessage() {
+      sendBtn.disabled = true;
+      try {
+        const res = await fetch("/webhook/manual", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            from_user: document.querySelector("#fromUser").value,
+            text: document.querySelector("#messageText").value
+          })
+        });
+        if (!res.ok) throw new Error(await res.text());
+        await loadMessages();
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    checkHealth().then(loadMessages);
+  </script>
+</body>
+</html>

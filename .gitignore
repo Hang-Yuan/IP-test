@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+
+# Runtime state and local message data
+wechat-gateway/data/
+*.log
+*.tmp
+*.bak
+
+# Local env / secrets
+.env
+*.local.env
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

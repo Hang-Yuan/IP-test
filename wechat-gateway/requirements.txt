@@ -1,0 +1,9 @@
+# Stage-one WeChat presentation prototype.
+# The local gateway itself uses the Python standard library.
+# The PC WeChat foreground send fallback needs pywin32 + pyperclip.
+pywin32
+pyperclip
+wx4py
+pycryptodome
+zstandard
+psutil
