@@ -124,9 +124,9 @@ python -m unittest discover -s tests -v
 | `WECHAT_CODEX_SKILL_PATH` | `skills/guo-hongbin/SKILL.md` |
 | `CODEX_CLI` | 可选，codex.exe 绝对路径 |
 | `WECHAT_PARALLEL_SUB_AGENTS` | 默认 `1`，开启 C1/M3/M4 并行 |
-| `WECHAT_AGENT_TIMEOUT` | 默认建议 `900` |
-| `WECHAT_SUB_AGENT_TIMEOUT` | 默认建议 `360` |
-| `WECHAT_M2_TIMEOUT` | 默认建议 `360` |
+| `WECHAT_AGENT_TIMEOUT` | 默认建议 `1800` |
+| `WECHAT_SUB_AGENT_TIMEOUT` | 默认建议 `900` |
+| `WECHAT_M2_TIMEOUT` | 默认建议 `900` |
 | `WECHAT_SEND_DRIVER` | 默认建议 `keyboard` |
 | `WECHAT_AUTO_SEND_ALLOW_TARGETS` | 可选白名单；为空时监听全部对话，但仍只回本轮 sender |
 | `WECHAT_AUTO_SEND_BLOCK_TARGETS` | 可选黑名单，默认建议屏蔽文件传输助手等系统会话 |

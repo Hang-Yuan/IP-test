@@ -26,11 +26,11 @@ Load only what the task needs:
 
 ## Call Workflow
 
-1. Read `_main.md` and infer the M2 gate: topic salience, value priority, emotional first reaction, and likely walk path.
-2. Decide whether the answer is simple, medium, or high difficulty.
-3. For simple social replies, use M4 first and keep output short.
-4. For medium replies, load M3 for anchors/cases and M4 for the speaking path, then synthesize through M2.
-5. For high-difficulty replies, load M3 candidates first, then C1 for structured reasoning, then use M4 for entry and close.
+1. For every substantive call, M2 must simultaneously call/read all three sub-agent packages before drafting: `sub_M3.md`, `sub_M4.md`, and `sub_C1.md`.
+2. M3 supplies memory, cases, time axis, policy anchors, and source evidence.
+3. M4 supplies WeChat-facing voice texture, opening path, transition, compression, and closing rhythm.
+4. C1 supplies reasoning, counterexamples, boundary checks, causal chains, and structural reframing.
+5. M2 must synthesize the three internal outputs with `_main.md`; do not answer from `_main.md` alone.
 6. Output only the final reply unless the user asks for trace, fidelity notes, or debug structure.
 
 ## Orchestration Rules
@@ -39,6 +39,7 @@ Load only what the task needs:
 - Use M3 as memory/retrieval: retrieve time axis, policy, case, anchor, metaphor, and source evidence.
 - Use M4 as path/texture: choose opening, transition, correction path, bridge, and closing rhythm.
 - Use C1 as explicit reasoning: structure, reframe, compare, and explain when M3 plus M4 are not enough.
+- In the WeChat/Codex bridge, M3, M4, and C1 are not optional branches. They are parallel internal inputs that M2 must integrate before replying.
 - Do not let generic LLM helpfulness override the persona. If a natural assistant answer conflicts with the persona settings, prefer the persona settings.
 - Keep the core pattern: experience/case first, then law/structure, then path.
 

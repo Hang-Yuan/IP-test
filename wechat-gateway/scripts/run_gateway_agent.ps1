@@ -14,9 +14,9 @@ $ProjectRoot = Split-Path -Parent (Split-Path -Parent $PSCommandPath)
 Set-Location $ProjectRoot
 
 $env:WECHAT_AGENT_MODE = $Agent
-$env:WECHAT_AGENT_TIMEOUT = if ($env:WECHAT_AGENT_TIMEOUT) { $env:WECHAT_AGENT_TIMEOUT } else { "900" }
-$env:WECHAT_SUB_AGENT_TIMEOUT = if ($env:WECHAT_SUB_AGENT_TIMEOUT) { $env:WECHAT_SUB_AGENT_TIMEOUT } else { "360" }
-$env:WECHAT_M2_TIMEOUT = if ($env:WECHAT_M2_TIMEOUT) { $env:WECHAT_M2_TIMEOUT } else { "360" }
+$env:WECHAT_AGENT_TIMEOUT = if ($env:WECHAT_AGENT_TIMEOUT) { $env:WECHAT_AGENT_TIMEOUT } else { "1800" }
+$env:WECHAT_SUB_AGENT_TIMEOUT = if ($env:WECHAT_SUB_AGENT_TIMEOUT) { $env:WECHAT_SUB_AGENT_TIMEOUT } else { "900" }
+$env:WECHAT_M2_TIMEOUT = if ($env:WECHAT_M2_TIMEOUT) { $env:WECHAT_M2_TIMEOUT } else { "900" }
 $env:WECHAT_PARALLEL_SUB_AGENTS = if ($env:WECHAT_PARALLEL_SUB_AGENTS) { $env:WECHAT_PARALLEL_SUB_AGENTS } else { "1" }
 $env:WECHAT_SEND_DRIVER = "keyboard"
 $env:WECHAT_COMMAND_SEND_DRIVER = "keyboard"

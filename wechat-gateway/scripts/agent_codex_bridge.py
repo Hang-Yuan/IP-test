@@ -42,14 +42,6 @@ class CodexResult:
 
 SUB_AGENT_SPECS = [
     SubAgentSpec(
-        name="C1",
-        role="负责逻辑推理、反例、边界、因果链和是否需要展开。只给M2内部判断，不直接回复用户。",
-        context_files=(
-            *COMMON_CONTEXT_FILES,
-            Path("references/persona/sub_C1.md"),
-        ),
-    ),
-    SubAgentSpec(
         name="M3",
         role="负责检索记忆、案例、时间轴、语料锚点和相似问题。只给M2内部候选材料，不直接回复用户。",
         context_files=(
@@ -65,6 +57,14 @@ SUB_AGENT_SPECS = [
             *COMMON_CONTEXT_FILES,
             Path("references/persona/sub_M4.md"),
             *R1_CONTEXT_FILES,
+        ),
+    ),
+    SubAgentSpec(
+        name="C1",
+        role="负责逻辑推理、反例、边界、因果链和是否需要展开。只给M2内部判断，不直接回复用户。",
+        context_files=(
+            *COMMON_CONTEXT_FILES,
+            Path("references/persona/sub_C1.md"),
         ),
     ),
 ]
@@ -216,7 +216,7 @@ def build_sub_agent_prompt(spec: SubAgentSpec, context: str, inbound_prompt: str
 
 
 def run_sub_agents(codex: str, skill_root: Path, inbound_prompt: str) -> dict[str, CodexResult]:
-    timeout = int_env("WECHAT_SUB_AGENT_TIMEOUT", 240)
+    timeout = int_env("WECHAT_SUB_AGENT_TIMEOUT", 900)
     results: dict[str, CodexResult] = {}
     with ThreadPoolExecutor(max_workers=len(SUB_AGENT_SPECS)) as executor:
         future_map = {}
@@ -235,7 +235,7 @@ def run_sub_agents(codex: str, skill_root: Path, inbound_prompt: str) -> dict[st
 
 def build_m2_prompt(inbound_prompt: str, m2_context: str, sub_results: dict[str, CodexResult]) -> str:
     sub_blocks = []
-    for name in ["C1", "M3", "M4"]:
+    for name in ["M3", "M4", "C1"]:
         result = sub_results.get(name)
         if not result:
             sub_blocks.append(f"===== {name} =====\n未返回。")
@@ -247,7 +247,7 @@ def build_m2_prompt(inbound_prompt: str, m2_context: str, sub_results: dict[str,
     return "\n".join(
         [
             "你是郭洪斌 IP 回复系统的 M2 orchestrator 主 agent。",
-            "本轮已经并行拉起 C1 / M3 / M4 三个 sub-agent。你必须综合三路内部意见，再生成最终微信回复。",
+            "本轮已经同时拉起 M3 / M4 / C1 三个 sub-agent，并分别读取对应描述包。你必须综合三路内部意见，再生成最终微信回复。",
             "只输出可以直接发给微信用户的一段中文回复，不输出分析标签、JSON、Markdown 标题、代码块、文件路径、调试说明或 sub-agent 名称。",
             "默认回复必须控制在150个中文字符以内。只有当用户明确要求详细展开、方案、拆解、长回复或多步骤建议时，才允许超过150字。",
             "短回复仍要保留判断、关键理由和下一步；不要为了像本人而展开成讲课稿。",
@@ -257,7 +257,7 @@ def build_m2_prompt(inbound_prompt: str, m2_context: str, sub_results: dict[str,
             "【M2 主控路径材料】",
             m2_context,
             "",
-            "【C1 / M3 / M4 并行内部意见】",
+            "【M3 / M4 / C1 并行内部意见】",
             "\n\n".join(sub_blocks),
             "",
             "【本轮微信消息】",
@@ -285,7 +285,7 @@ def main() -> int:
         sub_results = run_sub_agents(codex, skill_root, prompt)
     m2_context = load_context(skill_root, M2_CONTEXT_FILES)
     wrapped = build_m2_prompt(prompt, m2_context, sub_results)
-    result = run_codex_prompt(codex, wrapped, int_env("WECHAT_M2_TIMEOUT", 300))
+    result = run_codex_prompt(codex, wrapped, int_env("WECHAT_M2_TIMEOUT", 900))
     if result.text:
         print(result.text)
     if not result.ok:
